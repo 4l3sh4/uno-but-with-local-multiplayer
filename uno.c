@@ -13,9 +13,39 @@ bool play_state = true;
 
 // initializing the 'dice' array for all the players
 int p_dice[6] = { 0, 0, 0, 0, 0, 0 };
+int n = sizeof(p_dice) / sizeof(p_dice[0]);
+
+// i took this from geeks4geeks for qsort (ref: https://www.geeksforgeeks.org/c/qsort-function-in-c/)
+int comp(const void *a, const void *b) {
+    return (*(int *)a - *(int *)b);
+}
 
 // which dice needs to be rerolled
 int p_reroll[6] = { 0, 0, 0, 0, 0, 0 };
+
+// player's score
+int p_score = 0;
+
+// score, if it's checked or not
+int scoring[15][3] = {
+  // upper section
+  {0, 0, 0}, // aces, #0 (count and add only aces)
+  {0, 0, 0}, // twos, #1 (count and add only twos)
+  {0, 0, 0}, // threes, #2 (count and add only threes)
+  {0, 0, 0}, // fours, #3 (count and add only fours)
+  {0, 0, 0}, // fives, #4 (count and add only fives)
+  {0, 0, 0}, // sixes, #5 (count and add only sixes)
+  {0, 0, 0}, // bonus, #6 (if total of all upper section boxes is >= 63, add a 35-point bonus)
+  // lower section
+  {0, 0, 0}, // three-of-a-kind, #7 (sum of all 5 dice if at least 3 dice match)
+  {0, 0, 0}, // four-of-a-kind, #8 (sum of all 5 dice if at least 4 dice match)
+  {0, 0, 0}, // full house, #9 (25 points for any set of 3 matching dice + a pair of matching dice)
+  {0, 0, 0}, // small straight, #10 (30 points for any four sequential dice)
+  {0, 0, 0}, // large straight, #11 (40 points for any five sequential dice)
+  {0, 0, 0}, // yahtzee, #12 (50 points for all five dice being the same)
+  {0, 0, 0}, // chance, #13 (sum of all 5 dice)
+  {0, 0, 0} // yahtzee bonus, #14
+};
 
 // amount of times a player can reroll
 int add_reroll = 2;
@@ -95,6 +125,66 @@ int main() {
             }
         }
     }
+
+    // calculating dice scores
+    // upper section
+    for (int i = 0; i <= 5; i++) {
+        qsort(p_dice, n, sizeof(p_dice[0]), comp);
+        // aces
+        if(p_dice[i] == 1){
+            scoring[0][2] += 1;
+        }
+        // twos
+        if(p_dice[i] == 2){
+            scoring[1][2] += 2;
+        }
+        // threes
+        if(p_dice[i] == 3){
+            scoring[2][2] += 3;
+        }
+        // fours
+        if(p_dice[i] == 4){
+            scoring[3][2] += 4;
+        }
+        // fives
+        if(p_dice[i] == 5){
+            scoring[4][2] += 5;
+        }
+        // sixes
+        if(p_dice[i] == 6){
+            scoring[5][2] += 6;
+        }
+    }
+
+    printf("\nPlease select where you'd like to score...");
+    printf("\nUpper Section");
+    if(scoring[0][1] != 1)
+        printf("\n1. Aces            | Possible score: ");
+    if(scoring[1][1] != 1)
+        printf("\n2. Twos            | Possible score: ");
+    if(scoring[2][1] != 1)
+        printf("\n3. Threes          | Possible score: ");
+    if(scoring[3][1] != 1)
+        printf("\n4. Fours           | Possible score: ");
+    if(scoring[4][1] != 1)
+        printf("\n5. Fives           | Possible score: ");
+    if(scoring[5][1] != 1)
+        printf("\n6. Sixes           | Possible score: ");
+    printf("\nLower Section");
+    if(scoring[7][1] != 1)
+        printf("\n7. Three-of-a-Kind | Possible score: ");
+    if(scoring[8][1] != 1)
+        printf("\n8. Four-of-a-Kind  | Possible score: ");
+    if(scoring[9][1] != 1)
+        printf("\n9. Full House      | Possible score: ");
+    if(scoring[10][1] != 1)
+        printf("\n10. Small Straight | Possible score: ");
+    if(scoring[11][1] != 1)
+        printf("\n11. Large Straight | Possible score: ");
+    if(scoring[12][1] != 1)
+        printf("\n12. Yahtzee        | Possible score: ");
+    if(scoring[13][1] != 1)
+        printf("\n13. Chance         | Possible score: ");
 
     return 0;
 }
